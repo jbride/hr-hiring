@@ -207,7 +207,7 @@ public abstract class AbstractCaseEndToEndTest {
                 "com.myspace.hr_hiring.hiring-case-definition", data, roleAssignments);*/
         
         CaseFileInstanceImpl cfim = (CaseFileInstanceImpl)caseService.newCaseFileInstance(_deploymentId,
-                "com.myspace.hr_hiring.hiring-case-definition", data);
+                "com.myspace.hr_hiring.hiring-case-definition", data, roleAssignments);
         //cfim.assign("talent-acquisition", new GroupImpl("admin"));
         
         logger.info("THESE ARE THE AVAILABLE ROLES:");

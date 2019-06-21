@@ -1,22 +1,13 @@
 package com.myspace.hr_hiring;
 
 import org.jbpm.services.api.model.UserTaskInstanceDesc;
-import org.jbpm.services.api.model.ProcessInstanceDesc;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
-import org.kie.api.task.model.Status;
-import org.kie.api.task.model.TaskSummary;
-import org.kie.internal.query.QueryFilter;
 
 public class EmptyCaseEndToEndTest extends AbstractCaseEndToEndTest {
 
