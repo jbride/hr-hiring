@@ -201,6 +201,7 @@ public abstract class AbstractCaseEndToEndTest {
         assertNotNull(processDefs);
         Map<String, OrganizationalEntity> roleAssignments = new HashMap<>();
         roleAssignments.put("talent-acquisition", new GroupImpl("admin"));
+        roleAssignments.put("benefits-compensation", new GroupImpl("admin"));
         roleAssignments.put("owner", new UserImpl("bob"));
 
         /*CaseFileInstance cfi = caseService.newCaseFileInstance(_deploymentId,
@@ -406,6 +407,8 @@ public abstract class AbstractCaseEndToEndTest {
 
         ksessionModel.newWorkItemHandlerModel("Log", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
         ksessionModel.newWorkItemHandlerModel("Service Task", "new org.jbpm.bpmn2.handler.ServiceTaskHandler(\"name\")");
+        ksessionModel.newWorkItemHandlerModel("Email", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
+        ksessionModel.newWorkItemHandlerModel("Rest", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
 
         KieFileSystem kfs = ks.newKieFileSystem();
         kfs.writeKModuleXML(kproj.toXML());
