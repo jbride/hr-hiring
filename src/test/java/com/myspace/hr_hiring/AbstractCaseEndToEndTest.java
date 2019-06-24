@@ -15,14 +15,12 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
-import org.drools.javaparser.utils.Log;
 import org.jbpm.casemgmt.api.CaseNotFoundException;
 import org.jbpm.casemgmt.api.CaseRuntimeDataService;
 import org.jbpm.casemgmt.api.CaseService;
 import org.jbpm.casemgmt.api.auth.AuthorizationManager;
 import org.jbpm.casemgmt.api.generator.CaseIdGenerator;
 import org.jbpm.casemgmt.api.model.CaseStatus;
-import org.jbpm.casemgmt.api.model.instance.CaseFileInstance;
 import org.jbpm.casemgmt.api.model.instance.CaseInstance;
 import org.jbpm.casemgmt.impl.AuthorizationManagerImpl;
 import org.jbpm.casemgmt.impl.CaseRuntimeDataServiceImpl;
@@ -71,7 +69,6 @@ import org.kie.api.conf.EventProcessingOption;
 import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.api.runtime.query.QueryContext;
 import org.kie.api.task.TaskService;
-import org.kie.api.task.UserGroupCallback;
 import org.kie.api.task.model.OrganizationalEntity;
 import org.kie.api.task.model.Status;
 import org.kie.api.task.model.TaskSummary;
@@ -123,7 +120,8 @@ public abstract class AbstractCaseEndToEndTest {
 
     @Before
     public void setUp() throws Exception {
-        if(configured) return;
+        if (configured)
+            return;
         configured = true;
         configureServices();
 
@@ -145,7 +143,7 @@ public abstract class AbstractCaseEndToEndTest {
         // use user name who is part of the case roles assignment
         // so (s)he will be authorized to access case instance
         identityProvider.setName("bob");
-        String rolesArr[] = { "admin", "talent-acquisition", "owner", "Administrators" };
+        String rolesArr[] = { "admin", "Administrators" };
         List<String> roles = new ArrayList<String>(Arrays.asList(rolesArr));
         identityProvider.setRoles(roles);
 
@@ -157,13 +155,13 @@ public abstract class AbstractCaseEndToEndTest {
         List<CaseStatus> caseStatuses = Collections.singletonList(CaseStatus.OPEN);
         caseRuntimeDataService.getCaseInstances(caseStatuses, new QueryContext(0, Integer.MAX_VALUE))
                 .forEach(caseInstance -> caseService.cancelCase(caseInstance.getCaseId()));
-        
+
         identityProvider.reset();
         identityProvider.setRoles(new ArrayList<>());
 
         cleanupSingletonSessionId();
 
-        if(deploymentUnit != null) {
+        if (deploymentUnit != null) {
             deploymentService.undeploy(deploymentUnit);
             deploymentUnit = null;
         }
@@ -204,16 +202,9 @@ public abstract class AbstractCaseEndToEndTest {
         roleAssignments.put("benefits-compensation", new GroupImpl("admin"));
         roleAssignments.put("owner", new UserImpl("bob"));
 
-        /*CaseFileInstance cfi = caseService.newCaseFileInstance(_deploymentId,
-                "com.myspace.hr_hiring.hiring-case-definition", data, roleAssignments);*/
-        
-        CaseFileInstanceImpl cfim = (CaseFileInstanceImpl)caseService.newCaseFileInstance(_deploymentId,
+        CaseFileInstanceImpl cfim = (CaseFileInstanceImpl) caseService.newCaseFileInstance(_deploymentId,
                 "com.myspace.hr_hiring.hiring-case-definition", data, roleAssignments);
-        //cfim.assign("talent-acquisition", new GroupImpl("admin"));
-        
-        logger.info("THESE ARE THE AVAILABLE ROLES:");
-        cfim.getRoles().forEach(r -> logger.info(r));
-                
+
         String caseId = caseService.startCase(_deploymentId, "com.myspace.hr_hiring.hiring-case-definition", cfim);
         assertNotNull(caseId);
         assertCaseInstanceActive(caseId);
@@ -222,12 +213,14 @@ public abstract class AbstractCaseEndToEndTest {
 
     protected List<Long> getTasksInCase(String caseId, int expectedProcessInstances, int expectedTasks) {
         // Get the tasks.
-        List<ProcessInstanceDesc> processInstances = caseRuntimeDataService.getProcessInstancesForCase(caseId, new QueryFilter())
-                .stream().collect(Collectors.toList());
+        List<ProcessInstanceDesc> processInstances = caseRuntimeDataService
+                .getProcessInstancesForCase(caseId, new QueryFilter()).stream().collect(Collectors.toList());
 
         assertEquals(expectedProcessInstances, processInstances.size());
         List<Long> taskIds = new ArrayList<>();
-        processInstances.forEach(pid -> {taskIds.addAll(runtimeDataService.getTasksByProcessInstanceId(pid.getId()));});
+        processInstances.forEach(pid -> {
+            taskIds.addAll(runtimeDataService.getTasksByProcessInstanceId(pid.getId()));
+        });
         assertEquals(expectedTasks, taskIds.size());
         return taskIds;
     }
@@ -278,25 +271,6 @@ public abstract class AbstractCaseEndToEndTest {
 
         HumanTaskConfigurator humanTaskConfigurator = HumanTaskServiceFactory.newTaskServiceConfigurator();
         humanTaskConfigurator.entityManagerFactory(emf);
-        // TODO: Define restrictive roles access
-        humanTaskConfigurator.userGroupCallback(new UserGroupCallback() {
-
-            @Override
-            public List<String> getGroupsForUser(String userId) {
-                String[] groups = { "admin", "talent-acquisition" };
-                return Arrays.asList(groups);
-            }
-
-            @Override
-            public boolean existsUser(String userId) {
-                return true;
-            }
-
-            @Override
-            public boolean existsGroup(String groupId) {
-                return true;
-            }
-        });
         taskService = humanTaskConfigurator.getTaskService();
 
         // build runtime data service
@@ -305,7 +279,8 @@ public abstract class AbstractCaseEndToEndTest {
         ((RuntimeDataServiceImpl) runtimeDataService).setIdentityProvider(identityProvider);
         ((RuntimeDataServiceImpl) runtimeDataService).setTaskService(taskService);
         ((RuntimeDataServiceImpl) runtimeDataService).setDeploymentRolesManager(deploymentRolesManager);
-        ((RuntimeDataServiceImpl) runtimeDataService).setTaskAuditService(TaskAuditServiceFactory.newTaskAuditServiceConfigurator().setTaskService(taskService).getTaskAuditService());
+        ((RuntimeDataServiceImpl) runtimeDataService).setTaskAuditService(TaskAuditServiceFactory
+                .newTaskAuditServiceConfigurator().setTaskService(taskService).getTaskAuditService());
         ((KModuleDeploymentService) deploymentService).setRuntimeDataService(runtimeDataService);
 
         // build process service
@@ -332,7 +307,8 @@ public abstract class AbstractCaseEndToEndTest {
         ((CaseServiceImpl) caseService).setAuthorizationManager(authorizationManager);
         ((CaseServiceImpl) caseService).setIdentityProvider(identityProvider);
 
-        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(identityProvider);
+        CaseConfigurationDeploymentListener configurationListener = new CaseConfigurationDeploymentListener(
+                identityProvider);
 
         // set runtime data service as listener on deployment service
         ((KModuleDeploymentService) deploymentService).addListener((RuntimeDataServiceImpl) runtimeDataService);
@@ -364,7 +340,8 @@ public abstract class AbstractCaseEndToEndTest {
         return createKieJar(ks, releaseId, resources, null);
     }
 
-    protected InternalKieModule createKieJar(KieServices ks, ReleaseId releaseId, List<String> resources, Map<String, String> extraResources) {
+    protected InternalKieModule createKieJar(KieServices ks, ReleaseId releaseId, List<String> resources,
+            Map<String, String> extraResources) {
 
         KieFileSystem kfs = createKieFileSystemWithKProject(ks);
         kfs.writePomXML(getPom(releaseId));
@@ -399,16 +376,23 @@ public abstract class AbstractCaseEndToEndTest {
     protected KieFileSystem createKieFileSystemWithKProject(KieServices ks) {
         KieModuleModel kproj = ks.newKieModuleModel();
 
-        KieBaseModel kieBaseModel1 = kproj.newKieBaseModel("KBase-test").setDefault(true).addPackage("*").setEqualsBehavior(EqualityBehaviorOption.EQUALITY).setEventProcessingMode(EventProcessingOption.STREAM);
+        KieBaseModel kieBaseModel1 = kproj.newKieBaseModel("KBase-test").setDefault(true).addPackage("*")
+                .setEqualsBehavior(EqualityBehaviorOption.EQUALITY)
+                .setEventProcessingMode(EventProcessingOption.STREAM);
 
         KieSessionModel ksessionModel = kieBaseModel1.newKieSessionModel("ksession-test");
 
-        ksessionModel.setDefault(true).setType(KieSessionModel.KieSessionType.STATEFUL).setClockType(ClockTypeOption.get("realtime"));
+        ksessionModel.setDefault(true).setType(KieSessionModel.KieSessionType.STATEFUL)
+                .setClockType(ClockTypeOption.get("realtime"));
 
-        ksessionModel.newWorkItemHandlerModel("Log", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
-        ksessionModel.newWorkItemHandlerModel("Service Task", "new org.jbpm.bpmn2.handler.ServiceTaskHandler(\"name\")");
-        ksessionModel.newWorkItemHandlerModel("Email", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
-        ksessionModel.newWorkItemHandlerModel("Rest", "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
+        ksessionModel.newWorkItemHandlerModel("Log",
+                "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
+        ksessionModel.newWorkItemHandlerModel("Service Task",
+                "new org.jbpm.bpmn2.handler.ServiceTaskHandler(\"name\")");
+        ksessionModel.newWorkItemHandlerModel("Email",
+                "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
+        ksessionModel.newWorkItemHandlerModel("Rest",
+                "new org.jbpm.process.instance.impl.demo.SystemOutWorkItemHandler()");
 
         KieFileSystem kfs = ks.newKieFileSystem();
         kfs.writeKModuleXML(kproj.toXML());
@@ -416,8 +400,14 @@ public abstract class AbstractCaseEndToEndTest {
     }
 
     protected String getPom(ReleaseId releaseId, ReleaseId... dependencies) {
-        String pom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n" + "  <modelVersion>4.0.0</modelVersion>\n" + "\n" + "  <groupId>" + releaseId.getGroupId() + "</groupId>\n" + "  <artifactId>" + releaseId.getArtifactId() + "</artifactId>\n" + "  <version>" + releaseId.getVersion() + "</version>\n" + "\n";
-        //ReleaseId cmiRid = ks.newReleaseId("org.jbpm", "jbpm-case-mgmt-impl", "7.18.0.Final-redhat-00004");
+        String pom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n" + "\n" + "  <groupId>" + releaseId.getGroupId()
+                + "</groupId>\n" + "  <artifactId>" + releaseId.getArtifactId() + "</artifactId>\n" + "  <version>"
+                + releaseId.getVersion() + "</version>\n" + "\n";
+        // ReleaseId cmiRid = ks.newReleaseId("org.jbpm", "jbpm-case-mgmt-impl",
+        // "7.18.0.Final-redhat-00004");
         pom += "<dependencies>\n";
         pom += "<dependency>\n";
         pom += "  <groupId>org.jbpm</groupId>\n";
@@ -439,27 +429,22 @@ public abstract class AbstractCaseEndToEndTest {
     }
 
     protected DeploymentDescriptor createDeploymentDescriptor() {
-        //add this listener by default
-        //listenerMvelDefinitions.add("new org.jbpm.casemgmt.impl.util.TrackingCaseEventListener()");
+        // add this listener by default
+        // listenerMvelDefinitions.add("new
+        // org.jbpm.casemgmt.impl.util.TrackingCaseEventListener()");
 
         DeploymentDescriptor customDescriptor = new DeploymentDescriptorImpl("org.jbpm.domain");
-        DeploymentDescriptorBuilder ddBuilder = customDescriptor.getBuilder()
-                .runtimeStrategy(RuntimeStrategy.PER_CASE)
+        DeploymentDescriptorBuilder ddBuilder = customDescriptor.getBuilder().runtimeStrategy(RuntimeStrategy.PER_CASE)
                 .addMarshalingStrategy(new ObjectModel("mvel", CaseMarshallerFactory.builder().withDoc().toString()))
-                .addWorkItemHandler(new NamedObjectModel("mvel", "StartCaseInstance", "new org.jbpm.casemgmt.impl.wih.StartCaseWorkItemHandler(ksession)"));
+                .addWorkItemHandler(new NamedObjectModel("mvel", "StartCaseInstance",
+                        "new org.jbpm.casemgmt.impl.wih.StartCaseWorkItemHandler(ksession)"));
 
-        listenerMvelDefinitions.forEach(
-                listenerDefinition -> ddBuilder.addEventListener(new ObjectModel("mvel", listenerDefinition))
-        );
+        listenerMvelDefinitions
+                .forEach(listenerDefinition -> ddBuilder.addEventListener(new ObjectModel("mvel", listenerDefinition)));
 
-        getProcessListeners().forEach(
-                listener -> ddBuilder.addEventListener(listener)
-        );
-        
-        getWorkItemHandlers().forEach(
-               listener -> ddBuilder.addWorkItemHandler(listener)
-        );
+        getProcessListeners().forEach(listener -> ddBuilder.addEventListener(listener));
 
+        getWorkItemHandlers().forEach(listener -> ddBuilder.addWorkItemHandler(listener));
 
         return customDescriptor;
     }
@@ -467,7 +452,7 @@ public abstract class AbstractCaseEndToEndTest {
     protected List<ObjectModel> getProcessListeners() {
         return new ArrayList<>();
     }
-    
+
     protected List<NamedObjectModel> getWorkItemHandlers() {
         return new ArrayList<>();
     }
@@ -477,11 +462,8 @@ public abstract class AbstractCaseEndToEndTest {
         deploymentUnit = new KModuleDeploymentUnit(GROUP_ID, ARTIFACT_ID, VERSION);
 
         final DeploymentDescriptor descriptor = new DeploymentDescriptorImpl();
-        descriptor.getBuilder().addEventListener(new NamedObjectModel(
-                "mvel",
-                "processIdentity",
-                "new org.jbpm.kie.services.impl.IdentityProviderAwareProcessListener(ksession)"
-        ));
+        descriptor.getBuilder().addEventListener(new NamedObjectModel("mvel", "processIdentity",
+                "new org.jbpm.kie.services.impl.IdentityProviderAwareProcessListener(ksession)"));
         deploymentUnit.setDeploymentDescriptor(descriptor);
         deploymentUnit.setStrategy(RuntimeStrategy.PER_CASE);
 
