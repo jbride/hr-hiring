@@ -13,6 +13,10 @@ public class JobApplication implements java.io.Serializable {
 
 	private java.util.List<com.myspace.hr_hiring.CandidateSkill> skills;
 
+	private java.lang.String jobIdRef;
+
+	private java.lang.String jobTitle;
+
 	public JobApplication() {
 	}
 
@@ -41,12 +45,31 @@ public class JobApplication implements java.io.Serializable {
 		this.skills = skills;
 	}
 
+	public java.lang.String getJobIdRef() {
+		return this.jobIdRef;
+	}
+
+	public void setJobIdRef(java.lang.String jobIdRef) {
+		this.jobIdRef = jobIdRef;
+	}
+
+	public java.lang.String getJobTitle() {
+		return this.jobTitle;
+	}
+
+	public void setJobTitle(java.lang.String jobTitle) {
+		this.jobTitle = jobTitle;
+	}
+
 	public JobApplication(java.lang.Boolean internal,
 			java.lang.String applicantName,
-			java.util.List<com.myspace.hr_hiring.CandidateSkill> skills) {
+			java.util.List<com.myspace.hr_hiring.CandidateSkill> skills,
+			java.lang.String jobIdRef, java.lang.String jobTitle) {
 		this.internal = internal;
 		this.applicantName = applicantName;
 		this.skills = skills;
+		this.jobIdRef = jobIdRef;
+		this.jobTitle = jobTitle;
 	}
 
 }

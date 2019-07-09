@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.kie.api.runtime.query.QueryContext;
 import org.jbpm.casemgmt.api.model.instance.CaseMilestoneInstance;
 import org.jbpm.casemgmt.api.model.instance.MilestoneStatus;
-import org.jbpm.services.api.model.UserTaskInstanceDesc;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
