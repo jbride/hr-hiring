@@ -49,32 +49,6 @@
       <version>7.18.0.Final-redhat-00004</version>
       <scope>provided</scope>
     </dependency>
-
-    <!-- TEST DEPENDENCIES -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>1.4.10</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jbpm</groupId>
-      <artifactId>jbpm-test</artifactId>
-      <version>7.18.0.Final-redhat-00004</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jbpm</groupId>
-        <artifactId>jbpm-case-mgmt-impl</artifactId>
-        <version>7.18.0.Final-redhat-00004</version>
-        <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
