@@ -27,6 +27,12 @@
             <parameters/>
             <name>StartCaseInstance</name>
         </work-item-handler>
+        <work-item-handler>
+            <resolver>mvel</resolver>
+            <identifier>new com.myspace.hr_hiring.wih.MailSimulator();</identifier>
+            <parameters/>
+            <name>Email</name>
+        </work-item-handler>
     </work-item-handlers>
     <environment-entries/>
     <configurations/>
