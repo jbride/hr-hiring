@@ -1,11 +1,8 @@
 package com.myspace.hr_hiring.wih;
 
-import java.util.HashMap;
-
 import org.kie.api.runtime.process.WorkItem;
 import org.kie.api.runtime.process.WorkItemHandler;
 import org.kie.api.runtime.process.WorkItemManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +12,10 @@ public class MailSimulator implements WorkItemHandler {
 
     @Override
     public void executeWorkItem(WorkItem workItem, WorkItemManager manager) {
-        String from = String.valueOf(workItem.getParameter("From"));
-        String subject = String.valueOf(workItem.getParameter("Subject"));
-        String body = String.valueOf(workItem.getParameter("Body"));
-        String to = String.valueOf(workItem.getParameter("To"));
+        String from = workItem.getParameter("From").toString();
+        String to = workItem.getParameter("To").toString();
+        String subject = workItem.getParameter("Subject").toString();
+        String body = workItem.getParameter("Body").toString();
 
         logger.info("******************** EMAIL SIMULATOR / *******************");
         logger.info("From:" + from);
@@ -27,9 +24,10 @@ public class MailSimulator implements WorkItemHandler {
         logger.info("--------------------------------------------");
         logger.info(body);
         logger.info("--------------------------------------------");
+
         logger.info("******************** / EMAIL SIMULATOR  *******************");
 
-        manager.completeWorkItem(workItem.getId(), new HashMap<String, Object>());
+        manager.completeWorkItem(workItem.getId(), null);
     }
 
     @Override

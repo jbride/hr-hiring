@@ -9,8 +9,8 @@
   <name>hr-hiring</name>
   <description>HR hiring case management project created with Business Central, RH PAM v7.3.1</description>
   <properties>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <dependencies>
     <dependency>
