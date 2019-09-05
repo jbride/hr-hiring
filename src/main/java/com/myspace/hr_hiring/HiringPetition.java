@@ -24,6 +24,10 @@ public class HiringPetition implements java.io.Serializable {
 
 	private java.lang.Boolean benefitsApproved;
 
+	private java.lang.String jobType;
+
+	private java.lang.String jobCategory;
+
 	public HiringPetition() {
 	}
 
@@ -106,6 +110,22 @@ public class HiringPetition implements java.io.Serializable {
 		this.benefitsApproved = benefitsApproved;
 	}
 
+	public java.lang.String getJobType() {
+		return this.jobType;
+	}
+
+	public void setJobType(java.lang.String jobType) {
+		this.jobType = jobType;
+	}
+
+	public java.lang.String getJobCategory() {
+		return this.jobCategory;
+	}
+
+	public void setJobCategory(java.lang.String jobCategory) {
+		this.jobCategory = jobCategory;
+	}
+
 	public HiringPetition(
 			java.lang.String jobTitle,
 			java.lang.String jobDescription,
@@ -114,7 +134,8 @@ public class HiringPetition implements java.io.Serializable {
 			java.util.List<java.lang.String> interviewers,
 			java.lang.Integer salaryMin, java.lang.Integer salaryMax,
 			java.util.List<com.myspace.hr_hiring.JobRoleBenefit> benefits,
-			java.lang.Boolean benefitsApproved) {
+			java.lang.Boolean benefitsApproved, java.lang.String jobType,
+			java.lang.String jobCategory) {
 		this.jobTitle = jobTitle;
 		this.jobDescription = jobDescription;
 		this.location = location;
@@ -124,6 +145,8 @@ public class HiringPetition implements java.io.Serializable {
 		this.salaryMax = salaryMax;
 		this.benefits = benefits;
 		this.benefitsApproved = benefitsApproved;
+		this.jobType = jobType;
+		this.jobCategory = jobCategory;
 	}
 
 }
